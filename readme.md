@@ -3,14 +3,21 @@
 1.  **Siapkan Environment File (.env):**
     -   Di **root folder** proyekmu, buat file bernama **`.env`**.
     -   Isi file tersebut dengan konfigurasi berikut, **sesuaikan nilainya**:
+```
         DB_PASSWORD=your_database_password
         DB_NAME= your_database_name
         JWT_SECRET=your_very_secure_and_long_jwt_secret_key
-2.  **Import Skema Database:**
+```
+#### DATABASE
+
+1. **Import Skema Database:**
+```
+
     -   Pastikan kamu sudah menginstal dan menjalankan **PostgreSQL**.
     -   Buat database baru, contohnya `employee_app_db`.
     -   **Import file `schema.sql`** yang berisi definisi tabel-tabel ke database `employee_app_db` kamu. 
-    Kamu bisa menggunakan perintah `psql -U your_username -d employee_app_db -f schema.sql` atau melalui GUI seperti pgAdmin.
+```
+Kamu bisa menggunakan perintah `psql -U your_username -d employee_app_db -f schema.sql` atau melalui GUI seperti pgAdmin.
 
 #### Bagian 1: Desain & Setup Database
 -   [ ] **Setup Database PostgreSQL:**

@@ -5,9 +5,9 @@
     -   Di **root folder** proyekmu, buat file bernama **`.env`**.
     -   Isi file tersebut dengan konfigurasi berikut, **sesuaikan nilainya**:
         ```env
-        DB_PASSWORD=your_database_password # Ganti dengan password PostgreSQL kamu
-        DB_NAME=
-        JWT_SECRET=your_very_secure_and_long_jwt_secret_key # Ganti dengan kunci rahasia JWT yang kuat
+        DB_PASSWORD=your_database_password
+        DB_NAME= your_database_name
+        JWT_SECRET=your_very_secure_and_long_jwt_secret_key
         ```
 2.  **Import Skema Database:**
     -   Pastikan kamu sudah menginstal dan menjalankan **PostgreSQL**.
@@ -19,7 +19,7 @@
 #### Bagian 1: Desain & Setup Database
 -   [ ] **Setup Database PostgreSQL:**
     -   [ ] Buat **database** baru di PostgreSQL (contoh: `employee_app_db`).
--   [ ] **Desain Tabel** (di file `schema.sql` berdasarkan SQL yang diberikan):
+-   [ ] **Desain Tabel**
     -   [ ] Buat tabel `companies` (dengan `id` (PK), `company_name`, `address`, **`latitude`**, **`longitude`**, `radius_meters`, `created_at`, `updated_at`, `deleted_at`).
     -   [ ] Buat tabel `users` (dengan `id` (PK), `email`, `password_hash`, `is_active`, `created_at`, `updated_at`, `deleted_at`).
     -   [ ] Buat tabel `employees` (dengan `id` (PK), **`user_id` (FK ke `users.id`)**, `company_id` (FK ke `companies.id`), `full_name`, `nik`, `phone_number`,`address`, `date_of_birth`, `position`, `department`, **`profile_picture_url`**, `joined_date`, `late_tolerate`, `created_at`, `updated_at`, `deleted_at`).

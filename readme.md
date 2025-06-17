@@ -1,42 +1,83 @@
-#### Persiapan Awal
+# 📦 FM Technical Test API
 
-1.  **Siapkan Environment File (.env):**
-    -   Di **root folder** proyekmu, buat file bernama **`.env`**.
-    -   Isi file tersebut dengan konfigurasi berikut, **sesuaikan nilainya**:
-```
-        DB_PASSWORD=your_database_password
-        DB_NAME= your_database_name
-        JWT_SECRET=your_very_secure_and_long_jwt_secret_key
-```
-#### DATABASE
+Project ini merupakan backend RESTful API yang dibuat dengan **Go menggunakan Echo Framework**. API ini dibuat untuk keperluan technical test, dengan arsitektur bertingkat: **handler → service → repository**. 
+Fitur utama mencakup autentikasi JWT, absensi karyawan (clock-in dan clock-out), serta upload gambar.
 
-1. **Import Skema Database:**
-```
+---
 
-    -   Pastikan kamu sudah menginstal dan menjalankan **PostgreSQL**.
-    -   Buat database baru, contohnya `employee_app_db`.
-    -   **Import file `schema.sql`** yang berisi definisi tabel-tabel ke database `employee_app_db` kamu. 
-```
-Kamu bisa menggunakan perintah `psql -U your_username -d employee_app_db -f schema.sql` atau melalui GUI seperti pgAdmin.
+## 📚 Dokumentasi API
 
-#### Bagian 1: Desain & Setup Database
--   [ ] **Setup Database PostgreSQL:**
-    -   [ ] Buat **database** baru di PostgreSQL (contoh: `employee_app_db`).
--   [ ] **Desain Tabel**
-    -   [ ] Buat tabel `companies` (dengan `id` (PK), `company_name`, `address`, **`latitude`**, **`longitude`**, `radius_meters`, `created_at`, `updated_at`, `deleted_at`).
-    -   [ ] Buat tabel `users` (dengan `id` (PK), `email`, `password_hash`, `is_active`, `created_at`, `updated_at`, `deleted_at`).
-    -   [ ] Buat tabel `employees` (dengan `id` (PK), **`user_id` (FK ke `users.id`)**, `company_id` (FK ke `companies.id`), `full_name`, `nik`, `phone_number`,`address`, `date_of_birth`, `position`, `department`, **`profile_picture_url`**, `joined_date`, `late_tolerate`, `created_at`, `updated_at`, `deleted_at`).
-    -   [ ] Buat tabel `employee_absences` (dengan `id` (PK), `employee_id` (FK ke `employees.id`), `clock_in_time`, `clock_out_time`, **`clock_in_photo_url`**, `clock_out_photo_url`, `status`, `notes`, `created_at`, `updated_at`, `deleted_at`).
-    -   [ ] Buat tabel `log_login_activities` (dengan `id` (PK), `user_id` (FK ke `users.id`, nullable), `attempt_time`, `ip_address`, `user_agent`, `status`, `message`).
-    -   [ ] Buat tabel `log_employee_activities` (dengan `id` (PK), `employee_id` (FK ke `employees.id`), `activity_time`, `action_type`, `description`, `ip_address`).
--   [ ] **Jalankan Script SQL:**
-    -   [ ] **Eksekusi** `schema.sql` di database PostgreSQL kamu.
-#### Bagian 2: RESTful API - Registrasi & Login
--   [ ] **Setup Awal Project Golang**
--   [ ] **Setup Security dan Token (saat ini: JWT)**
--   [ ] **Endpoint Registrasi dan Login**
-#### Bagian 3: Modul Absensi dengan Geotagging
--   [ ] **Endpoint untuk melakukan absen(menerima lat-long untuk geotagging)**
--   [ ] **Menambahkan Validasi Radius untuk lat-long yang diberikan saat absen**
--   [ ] **Melakukan Pencatatan aktivitas pada karyawan (log)**
+Swagger UI tersedia di: 
 
+`` http://localhost:50001/swagger/index.html ``
+
+
+Untuk mengakses endpoint yang dilindungi, gunakan token JWT dengan format:
+
+``Authorization: Bearer <token_kamu>``
+
+
+Kamu bisa klik tombol **Authorize** di Swagger UI untuk memasukkan token tersebut.
+
+---
+
+## 📁 Struktur Folder
+
+- `app/` – Konfigurasi aplikasi dan inisialisasi database
+- `handler/` – HTTP handler untuk Echo
+- `service/` – Logika bisnis
+- `repository/` – Akses database (PostgreSQL)
+- `upload/image/` – Folder penyimpanan file gambar yang diunggah (nanti akan terbuat saat upload image)
+
+---
+
+## 🧭 Daftar Endpoint API
+
+### 🔐 `/api/v1/user` – Autentikasi User
+
+| Endpoint | Method | Deskripsi |
+|----------|--------|-----------|
+| `/register` | POST | Mendaftarkan user baru sekaligus data karyawan. |
+| `/login`    | POST | Login dan mendapatkan token JWT untuk akses endpoint selanjutnya. |
+
+📌 **Kenapa seperti ini?**
+- Proses registrasi dibuat gabungan karena user dan karyawan didaftarkan bersamaan.
+- JWT digunakan agar sistem tetap stateless dan mudah diintegrasikan ke frontend/mobile.
+
+---
+
+### 🕒 `/api/v1/employee` – Absensi Karyawan
+
+> Semua endpoint berikut **butuh autentikasi** JWT.
+
+| Endpoint | Method | Deskripsi                                                |
+|----------|--------|----------------------------------------------------------|
+| `/clock_in`  | POST | Mengirim data clock-in termasuk lokasi dan foto absensi. |
+| `/clock_out` | POST | Mengirim data clock-out dengan lokasi dan foto absensi saat keluar.      |
+| `/absence/log` | GET | Mengambil riwayat absensi user yang sedang login.        |
+
+📌 **Kenapa seperti ini?**
+- Lokasi dipakai untuk validasi kehadiran karyawan di area(radius) kerja yang ditentukan.
+- Token JWT digunakan untuk mengidentifikasi siapa yang melakukan clock-in/out tanpa perlu kirim email di request.
+
+---
+
+### 🖼 `/api/v1/image` – Upload Gambar
+
+> Semua endpoint berikut **butuh autentikasi** JWT.
+
+| Endpoint | Method | Deskripsi |
+|----------|--------|-----------|
+| `/save` | POST | Mengunggah gambar menggunakan `multipart/form-data`, menyertakan `jenis` (contoh: avatar, checkin, dll). |
+
+📌 **Kenapa seperti ini?**
+- File dikelompokkan berdasarkan jenis-nya agar rapi dalam folder `upload/image/{jenis}/...`.
+- File yang berhasil diupload bisa langsung diakses secara publik via URL statis.
+
+---
+
+## 🌐 Akses File Statis
+
+Setelah gambar berhasil diunggah, kamu bisa akses file-nya di:
+
+`` http://{{url}}/uploads/avatar/1721251820.jpg ``

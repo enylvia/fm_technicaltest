@@ -1,0 +1,295 @@
+basePath: /api/v1
+definitions:
+  models.AbsenceClockIn:
+    properties:
+      clock_in_photo_url:
+        example: https://example.com/absensi_foto/checkin_john_doe_20250616.jpg
+        type: string
+      latitude:
+        example: -6.2
+        type: number
+      longitude:
+        example: 106.816666
+        type: number
+      notes:
+        example: optional
+        type: string
+    type: object
+  models.AbsenceClockOut:
+    properties:
+      clock_in_photo_url:
+        example: https://example.com/absensi_foto/checkin_john_doe_20250616.jpg
+        type: string
+      id:
+        type: integer
+      latitude:
+        example: -6.2
+        type: number
+      longitude:
+        example: 106.816666
+        type: number
+    type: object
+  models.LoginUserPayload:
+    properties:
+      email:
+        example: john.doe@example.com
+        type: string
+      password:
+        example: StrongPassword123!
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.Response:
+    properties:
+      count:
+        type: integer
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.UserandEmployeeRegisterPayload:
+    properties:
+      address:
+        example: Jl. Merdeka No. 10, Jakarta
+        type: string
+      company_id:
+        example: 1
+        type: integer
+      date_of_birth:
+        example: "1990-05-15"
+        type: string
+      department_id:
+        example: 1
+        type: integer
+      email:
+        example: john.doe@example.com
+        type: string
+      full_name:
+        example: John Doe
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      joined_date:
+        example: "2023-01-20"
+        type: string
+      late_tolerance:
+        example: 15
+        type: integer
+      nik:
+        example: "123456789012345"
+        type: string
+      password:
+        example: StrongPassword123!
+        type: string
+      phone_number:
+        example: "081234567890"
+        type: string
+      position_id:
+        example: 1
+        type: integer
+      profile_picture_url:
+        example: https://example.com/images/john_doe_profile.jpg
+        type: string
+    required:
+    - company_id
+    - date_of_birth
+    - department_id
+    - email
+    - full_name
+    - nik
+    - password
+    - phone_number
+    - position_id
+    type: object
+host: localhost:50001
+info:
+  contact: {}
+  description: Dokumentasi API untuk FM Technical Test
+  title: FM Technical Test API
+  version: "1.0"
+paths:
+  /employee/absence/log:
+    get:
+      description: Mengambil riwayat absensi berdasarkan email dari JWT
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Get Absence History
+      tags:
+      - absence
+  /employee/clock_in:
+    post:
+      consumes:
+      - application/json
+      description: Melakukan clock-in (absensi masuk) oleh karyawan berdasarkan lokasi
+        dan waktu
+      parameters:
+      - description: Data absensi masuk (lokasi, waktu, dll.)
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.AbsenceClockIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Clock In Request
+      tags:
+      - absence
+  /employee/clock_out:
+    post:
+      consumes:
+      - application/json
+      description: Melakukan clock-out (absensi pulang) oleh karyawan berdasarkan
+        lokasi
+      parameters:
+      - description: Data absensi pulang (lokasi, waktu, dll.)
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.AbsenceClockOut'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Clock Out Request
+      tags:
+      - absence
+  /image/save:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Mengunggah gambar berdasarkan jenis dan file
+      parameters:
+      - description: 'Jenis file (misalnya: avatar, profile, etc)'
+        in: formData
+        name: jenis
+        required: true
+        type: string
+      - description: File gambar yang akan diunggah
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Upload Image
+      tags:
+      - image
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentikasi user dengan email dan password
+      parameters:
+      - description: Email dan password untuk login
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginUserPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Login User
+      tags:
+      - authenticate
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register User and Employee
+      parameters:
+      - description: Request body untuk register
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserandEmployeeRegisterPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Register User and Employee
+      tags:
+      - authenticate
+securityDefinitions:
+  BearerAuth:
+    description: 'Masukkan token JWT kamu dengan format: Bearer <token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

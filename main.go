@@ -54,7 +54,6 @@ func main() {
 	v1 := e.Group("/api/v1")
 	userGroup := v1.Group("/user")
 	{
-		// TODO REGISTER AND LOGIN USER WITH LOG
 		userGroup.POST("/register", userHandler.RegisterUserAndEmployee)
 		userGroup.POST("/login", userHandler.LoginUser)
 	}
